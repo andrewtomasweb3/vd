@@ -35,6 +35,20 @@ api_router = APIRouter(prefix="/api")
 
 # Global MEV Bot instance
 mev_bot: Optional[MEVBot] = None
+micro_strategy: Optional[MicroMEVStrategy] = None
+
+# Initialize micro strategy for $8 balance trading
+async def init_micro_strategy():
+    global micro_strategy
+    try:
+        micro_strategy = MicroMEVStrategy()
+        logger.info("Micro MEV strategy initialized for small balance trading")
+    except Exception as e:
+        logger.error(f"Failed to initialize micro strategy: {e}")
+
+@app.on_event("startup")
+async def startup_event():
+    await init_micro_strategy()
 
 # MEV Bot Models
 class BotConfig(BaseModel):
