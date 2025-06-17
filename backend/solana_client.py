@@ -25,19 +25,19 @@ class SolanaClient:
         
         # Known DEX program IDs for arbitrage
         self.dex_programs = {
-            "raydium": PublicKey("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"),
-            "orca": PublicKey("9W959DqEETiGZocYWCQPaJ6sKoAz6Jv4gG5JMhH2q1Gg"),
-            "serum": PublicKey("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"),
-            "jupiter": PublicKey("JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"),
+            "raydium": Pubkey.from_string("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"),
+            "orca": Pubkey.from_string("9W959DqEETiGZocYWCQPaJ6sKoAz6Jv4gG5JMhH2q1Gg"),
+            "serum": Pubkey.from_string("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"),
+            "jupiter": Pubkey.from_string("JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"),
         }
         
         # Major token addresses
         self.tokens = {
-            "SOL": PublicKey("So11111111111111111111111111111111111111112"),
-            "USDC": PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-            "USDT": PublicKey("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"),
-            "RAY": PublicKey("4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R"),
-            "SRM": PublicKey("SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt"),
+            "SOL": Pubkey.from_string("So11111111111111111111111111111111111111112"),
+            "USDC": Pubkey.from_string("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+            "USDT": Pubkey.from_string("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"),
+            "RAY": Pubkey.from_string("4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R"),
+            "SRM": Pubkey.from_string("SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt"),
         }
     
     async def get_token_price(self, token_address: str, dex: str = "jupiter") -> Optional[float]:
