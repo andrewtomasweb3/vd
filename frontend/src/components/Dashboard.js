@@ -124,10 +124,10 @@ const Dashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-green-400 mb-2">
-            Solana MEV Bot Dashboard
+            💰 $8 Micro MEV Bot - Pump.fun & Multi-DEX Arbitrage
           </h1>
           <p className="text-gray-400">
-            Advanced Maximum Extractable Value Trading Bot
+            Advanced MEV Trading optimized for small balances • Raydium • Meteora • Pump.fun • Jupiter
           </p>
         </div>
 
