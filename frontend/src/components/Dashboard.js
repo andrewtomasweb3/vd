@@ -6,6 +6,7 @@ import TradingMetrics from './TradingMetrics';
 import OpportunitiesPanel from './OpportunitiesPanel';
 import TradeHistory from './TradeHistory';
 import BotControls from './BotControls';
+import PumpFunPanel from './PumpFunPanel';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
