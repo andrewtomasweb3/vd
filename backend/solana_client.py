@@ -109,9 +109,12 @@ class SolanaClient:
     async def get_token_accounts(self, wallet_address: str) -> List[Dict]:
         """Get all token accounts for wallet"""
         try:
+            wallet_pubkey = Pubkey.from_string(wallet_address)
+            token_program_id = Pubkey.from_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+            
             response = await self.client.get_token_accounts_by_owner(
-                PublicKey(wallet_address),
-                {"programId": PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")}
+                wallet_pubkey,
+                {"programId": token_program_id}
             )
             return response.value if response.value else []
         except Exception as e:
@@ -121,7 +124,8 @@ class SolanaClient:
     async def get_account_balance(self, address: str) -> float:
         """Get SOL balance for address"""
         try:
-            response = await self.client.get_balance(PublicKey(address))
+            pubkey = Pubkey.from_string(address)
+            response = await self.client.get_balance(pubkey)
             return response.value / 1e9  # Convert lamports to SOL
         except Exception as e:
             logger.error(f"Error getting balance: {e}")
