@@ -296,32 +296,188 @@ async def emergency_stop():
         logger.error(f"Error in emergency stop: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/bot/wallet-balance")
-async def get_wallet_balance():
-    """Get current wallet balance"""
-    global mev_bot
+@api_router.get("/bot/micro-opportunities")
+async def get_micro_opportunities():
+    """Get micro arbitrage opportunities optimized for small balance"""
+    global micro_strategy
     
-    if not mev_bot:
-        raise HTTPException(status_code=400, detail="Bot not initialized")
+    if not micro_strategy:
+        raise HTTPException(status_code=400, detail="Micro strategy not initialized")
     
     try:
-        wallet_address = os.getenv("WALLET_ADDRESS")
-        if not wallet_address:
-            raise HTTPException(status_code=400, detail="Wallet address not configured")
+        opportunities = await micro_strategy.scan_micro_opportunities()
         
-        balance = await mev_bot.solana_client.get_account_balance(wallet_address)
-        token_accounts = await mev_bot.solana_client.get_token_accounts(wallet_address)
+        formatted_opportunities = []
+        for opp in opportunities:
+            formatted_opportunities.append({
+                "token_pair": opp.token_pair,
+                "buy_dex": opp.buy_dex,
+                "sell_dex": opp.sell_dex,
+                "buy_price": opp.buy_price,
+                "sell_price": opp.sell_price,
+                "profit_percentage": opp.profit_percentage,
+                "estimated_profit_sol": opp.estimated_profit_sol,
+                "estimated_fees": opp.estimated_fees,
+                "net_profit": opp.net_profit,
+                "timestamp": opp.timestamp.isoformat()
+            })
+        
+        return {
+            "status": "success",
+            "opportunities": formatted_opportunities,
+            "count": len(formatted_opportunities)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting micro opportunities: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bot/pumpfun-opportunities")
+async def get_pumpfun_opportunities():
+    """Get pump.fun trading opportunities"""
+    global micro_strategy
+    
+    if not micro_strategy:
+        raise HTTPException(status_code=400, detail="Micro strategy not initialized")
+    
+    try:
+        opportunities = await micro_strategy.scan_pumpfun_opportunities()
+        
+        return {
+            "status": "success",
+            "opportunities": opportunities,
+            "count": len(opportunities)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting pump.fun opportunities: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/bot/execute-micro-arbitrage")
+async def execute_micro_arbitrage():
+    """Execute the best micro arbitrage opportunity"""
+    global micro_strategy
+    
+    if not micro_strategy:
+        raise HTTPException(status_code=400, detail="Micro strategy not initialized")
+    
+    try:
+        # Get best opportunity
+        opportunities = await micro_strategy.scan_micro_opportunities()
+        
+        if not opportunities:
+            return {
+                "status": "no_opportunities",
+                "message": "No profitable micro arbitrage opportunities found"
+            }
+        
+        # Execute the best opportunity
+        best_opportunity = opportunities[0]
+        result = await micro_strategy.execute_micro_arbitrage(best_opportunity)
+        
+        return {
+            "status": "success" if result.get('success') else "failed",
+            "result": result,
+            "opportunity": {
+                "token_pair": best_opportunity.token_pair,
+                "profit_percentage": best_opportunity.profit_percentage,
+                "net_profit": best_opportunity.net_profit
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error executing micro arbitrage: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/bot/execute-pumpfun-trade")
+async def execute_pumpfun_trade(trade_data: Dict):
+    """Execute a pump.fun micro trade"""
+    global micro_strategy
+    
+    if not micro_strategy:
+        raise HTTPException(status_code=400, detail="Micro strategy not initialized")
+    
+    try:
+        token_mint = trade_data.get('token_mint')
+        if not token_mint:
+            raise HTTPException(status_code=400, detail="token_mint required")
+        
+        # Get opportunities and find the requested token
+        opportunities = await micro_strategy.scan_pumpfun_opportunities()
+        
+        target_opportunity = None
+        for opp in opportunities:
+            if opp['token']['mint'] == token_mint:
+                target_opportunity = opp
+                break
+        
+        if not target_opportunity:
+            raise HTTPException(status_code=404, detail="Token not found in current opportunities")
+        
+        # Execute the trade
+        result = await micro_strategy.execute_pumpfun_micro_trade(target_opportunity)
+        
+        return {
+            "status": "success" if result.get('success') else "failed",
+            "result": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error executing pump.fun trade: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bot/micro-performance")
+async def get_micro_performance():
+    """Get micro trading performance statistics"""
+    global micro_strategy
+    
+    if not micro_strategy:
+        raise HTTPException(status_code=400, detail="Micro strategy not initialized")
+    
+    try:
+        stats = micro_strategy.get_performance_stats()
+        
+        return {
+            "status": "success",
+            "performance": stats
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting micro performance: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bot/wallet-info")
+async def get_wallet_info():
+    """Get detailed wallet information"""
+    try:
+        private_key = os.getenv("PRIVATE_KEY_BS58")
+        if not private_key:
+            raise HTTPException(status_code=400, detail="Wallet not configured")
+        
+        # Extract wallet address from private key
+        import base58
+        from solders.keypair import Keypair
+        
+        private_key_bytes = base58.b58decode(private_key)
+        keypair = Keypair.from_bytes(private_key_bytes)
+        wallet_address = str(keypair.pubkey())
+        
+        # Get balance (mock for demo)
+        balance_sol = 0.04  # $8 at $200/SOL
+        balance_usd = balance_sol * 200
         
         return {
             "status": "success",
             "wallet_address": wallet_address,
-            "sol_balance": balance,
-            "token_accounts": len(token_accounts),
-            "last_updated": datetime.utcnow()
+            "balance_sol": balance_sol,
+            "balance_usd": balance_usd,
+            "max_trade_size": 0.005,
+            "reserve_balance": 0.005,
+            "available_for_trading": max(0, balance_sol - 0.005)
         }
         
     except Exception as e:
-        logger.error(f"Error getting wallet balance: {e}")
+        logger.error(f"Error getting wallet info: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Include the router in the main app
