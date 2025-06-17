@@ -234,10 +234,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Core Solana Web3 Integration"
-    - "Arbitrage Detection System"
+    - "MEV Bot API Endpoints"
+    - "MEV Bot Dashboard"
+    - "Bot Controls Interface"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
