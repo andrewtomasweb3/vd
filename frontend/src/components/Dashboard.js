@@ -134,9 +134,9 @@ const Dashboard = () => {
         {!isSetup ? (
           <WalletSetup onSetupComplete={handleSetupComplete} />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Bot Status and Controls */}
-            <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6">
+            {/* Top Row - Bot Status and Controls */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <BotStatus 
                 status={botStatus} 
                 walletBalance={walletBalance}
@@ -148,24 +148,32 @@ const Dashboard = () => {
               />
             </div>
 
-            {/* Middle Column - Trading Metrics and Opportunities */}
-            <div className="lg:col-span-1 space-y-6">
+            {/* Second Row - Trading Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
               <TradingMetrics 
                 status={botStatus}
                 trades={trades}
               />
-              <OpportunitiesPanel 
-                opportunities={opportunities}
-                isRunning={botStatus?.is_running}
-              />
             </div>
 
-            {/* Right Column - Trade History */}
-            <div className="lg:col-span-1">
-              <TradeHistory 
-                trades={trades}
-                onRefresh={fetchTrades}
+            {/* Third Row - Opportunities and Trading */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column - Pump.fun and Micro Arbitrage */}
+              <PumpFunPanel 
+                isRunning={botStatus?.is_running}
               />
+              
+              {/* Right Column - Traditional Arbitrage and Trade History */}
+              <div className="space-y-6">
+                <OpportunitiesPanel 
+                  opportunities={opportunities}
+                  isRunning={botStatus?.is_running}
+                />
+                <TradeHistory 
+                  trades={trades}
+                  onRefresh={fetchTrades}
+                />
+              </div>
             </div>
           </div>
         )}
