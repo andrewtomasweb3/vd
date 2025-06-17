@@ -15,6 +15,8 @@ import asyncio
 from .mev_bot import MEVBot
 from .solana_client import SolanaClient
 from .mev_strategies import MEVStrategies
+from .micro_mev_strategy import MicroMEVStrategy
+from .advanced_dex_client import AdvancedDEXClient
 
 
 ROOT_DIR = Path(__file__).parent
