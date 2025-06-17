@@ -31,6 +31,32 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Global MEV Bot instance
+mev_bot: Optional[MEVBot] = None
+
+# MEV Bot Models
+class BotConfig(BaseModel):
+    scan_interval: int = 5
+    max_concurrent_trades: int = 3
+    stop_loss_percentage: float = 5.0
+    take_profit_percentage: float = 10.0
+    min_profit_percentage: float = 0.5
+    max_position_size: float = 1.0
+    enabled_strategies: List[str] = ["arbitrage", "token_snipe"]
+
+class WalletSetup(BaseModel):
+    wallet_address: str
+    rpc_endpoint: Optional[str] = None
+    private_rpc_endpoint: Optional[str] = None
+
+class BotStatus(BaseModel):
+    is_running: bool
+    wallet_balance: float
+    current_opportunities: int
+    total_profit: float
+    total_trades: int
+    success_rate: float
+
 
 # Define Models
 class StatusCheck(BaseModel):
