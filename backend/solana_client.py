@@ -2,7 +2,6 @@ import asyncio
 import logging
 from typing import Dict, List, Optional, Any
 from solana.rpc.async_api import AsyncClient
-from solana.rpc.types import RPCResponse
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
 from solders.keypair import Keypair
